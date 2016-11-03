@@ -25,12 +25,15 @@
 <meta property="og:description" content="一级标题二级标题三级标题$T(n) = \Theta(n)$
 令$h(x)$是一个perceptron，你给我一个$x$($x$是一个特征向量)，把$x$输入$h(x)$，它就会输出这个$x$的类别
 1234567891011121314# https://datasciencelab.wordpress.com/2014/01/10/machine-learning-classics-the-p">
-<meta property="og:updated_time" content="2016-10-27T06:32:04.000Z">
+<meta property="og:image" content="http://yoursite.com/perceptron_lihang_original_17_1.png">
+<meta property="og:image" content="http://yoursite.com/perceptron_lihang_original.gif">
+<meta property="og:updated_time" content="2016-11-03T07:30:58.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ML-Perceptron Learning Algorithm (PLA)">
 <meta name="twitter:description" content="一级标题二级标题三级标题$T(n) = \Theta(n)$
 令$h(x)$是一个perceptron，你给我一个$x$($x$是一个特征向量)，把$x$输入$h(x)$，它就会输出这个$x$的类别
 1234567891011121314# https://datasciencelab.wordpress.com/2014/01/10/machine-learning-classics-the-p">
+<meta name="twitter:image" content="http://yoursite.com/perceptron_lihang_original_17_1.png">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
@@ -305,6 +308,46 @@
         <h1 id="一级标题"><a href="#一级标题" class="headerlink" title="一级标题"></a>一级标题</h1><h2 id="二级标题"><a href="#二级标题" class="headerlink" title="二级标题"></a>二级标题</h2><h3 id="三级标题"><a href="#三级标题" class="headerlink" title="三级标题"></a>三级标题</h3><p>$T(n) = \Theta(n)$</p>
 <p>令$h(x)$是一个perceptron，你给我一个$x$($x$是一个特征向量)，把$x$输入$h(x)$，它就会输出这个$x$的类别</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># https://datasciencelab.wordpress.com/2014/01/10/machine-learning-classics-the-perceptron/</span></div><div class="line"><span class="comment">#</span></div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">import</span> random</div><div class="line"><span class="keyword">import</span> os, subprocess</div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></div><div class="line">    p = Perceptron(<span class="number">20</span>)</div><div class="line">    p.plot()</div><div class="line">    p.pla(save=<span class="keyword">True</span>)</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    main()</div></pre></td></tr></table></figure>
+<h1 id="程序实例"><a href="#程序实例" class="headerlink" title="程序实例"></a>程序实例</h1><h2 id="感知机原始形式"><a href="#感知机原始形式" class="headerlink" title="感知机原始形式"></a>感知机原始形式</h2><p>这个文件是《统计学习方法》(李航)一书中对应的例子.</p>
+<p>这里用到<code>numpy</code>, 以支持向量运算.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div></pre></td></tr></table></figure>
+<h3 id="设置数据集"><a href="#设置数据集" class="headerlink" title="设置数据集"></a>设置数据集</h3><p>训练数据集, $x_1=(3,3)^T$, $x_2=(4,3)^T$为正例, $x_3=(1,1)^T$为负例.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">training_data = [[np.array([<span class="number">3</span>,<span class="number">3</span>]),<span class="number">1</span>], [np.array([<span class="number">4</span>,<span class="number">3</span>]),<span class="number">1</span>], [np.array([<span class="number">1</span>,<span class="number">1</span>]), <span class="number">-1</span>]]</div></pre></td></tr></table></figure>
+<h3 id="设置初始运行参数"><a href="#设置初始运行参数" class="headerlink" title="设置初始运行参数"></a>设置初始运行参数</h3><p>设置初始运行参数$w_0=0$, $b_0=0$, 学习率$\eta$用<code>learning_rate</code>表示.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">w_0 = np.array([<span class="number">0</span>,<span class="number">0</span>])</div><div class="line">b_0 = <span class="number">0</span></div><div class="line"><span class="comment"># history用于保存计算中间过程数据</span></div><div class="line">history = []</div><div class="line">learning_rate = <span class="number">1</span></div></pre></td></tr></table></figure>
+<h3 id="判断表达式"><a href="#判断表达式" class="headerlink" title="判断表达式"></a>判断表达式</h3><p>判断表达式的计算: $y_i(w \cdot x_i +b)$:</p>
+<ul>
+<li><code>item[0]</code>表示$x_i$</li>
+<li><code>item[1]</code>表示$y_i$</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">calculate_equation</span><span class="params">(item, w, b)</span>:</span></div><div class="line">    <span class="comment"># y_i*(w*x_i + b)</span></div><div class="line">    <span class="comment"># y_i = item[1]</span></div><div class="line">    <span class="keyword">return</span> item[<span class="number">1</span>] * (np.dot(w, item[<span class="number">0</span>]) + b)</div></pre></td></tr></table></figure>
+<h3 id="w-和-b-的更新"><a href="#w-和-b-的更新" class="headerlink" title="$w$和$b$的更新"></a>$w$和$b$的更新</h3><p>当$y_i(w \cdot x_i +b) \leq 0$时, 更新$w$和$b$:</p>
+<ul>
+<li>$w \leftarrow w + \eta y_i x_i$</li>
+<li>$b \leftarrow b + \eta y_i$</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">update</span><span class="params">(item, w, b, learning_rate)</span>:</span></div><div class="line">    <span class="comment"># w &lt;- w + learning_rate*y_i*x_i</span></div><div class="line">    <span class="comment"># b &lt;- b + learning_rate*y_i</span></div><div class="line">    w_new = np.array([])</div><div class="line">    w_new = w + learning_rate * item[<span class="number">1</span>] * item[<span class="number">0</span>]</div><div class="line">    b_new = b + learning_rate * item[<span class="number">1</span>]</div><div class="line">    history.append([w_new, b_new])</div><div class="line">    <span class="keyword">return</span> w_new, b_new</div></pre></td></tr></table></figure>
+<h3 id="感知机原始形式计算"><a href="#感知机原始形式计算" class="headerlink" title="感知机原始形式计算"></a>感知机原始形式计算</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">classify_result = <span class="number">0</span></div><div class="line"><span class="comment"># 每当分类正确则加1,等于3时,说明三个点完全分类正确</span></div><div class="line">w = w_0</div><div class="line">b = b_0</div><div class="line"><span class="keyword">while</span> (classify_result != <span class="number">3</span>) :</div><div class="line">    classify_result = <span class="number">0</span></div><div class="line">    <span class="keyword">for</span> each <span class="keyword">in</span> training_data:</div><div class="line">        <span class="keyword">if</span> calculate_equation(each, w, b) &lt;= <span class="number">0</span>:</div><div class="line">            w, b = update(each, w, b, learning_rate)</div><div class="line">            print(<span class="string">'w = '</span>, w, <span class="string">'  b = '</span>, b)</div><div class="line">            <span class="keyword">break</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            classify_result += <span class="number">1</span></div><div class="line">print(<span class="string">'RESULT： w = '</span>, w, <span class="string">'  b = '</span>, b)</div></pre></td></tr></table></figure>
+<pre><code>w =  [3 3]   b =  1
+w =  [2 2]   b =  0
+w =  [1 1]   b =  -1
+w =  [0 0]   b =  -2
+w =  [3 3]   b =  -1
+w =  [2 2]   b =  -2
+w =  [1 1]   b =  -3
+RESULT： w =  [1 1]   b =  -3
+</code></pre><h3 id="计算过程图形绘制"><a href="#计算过程图形绘制" class="headerlink" title="计算过程图形绘制"></a>计算过程图形绘制</h3><h4 id="生成gif图像"><a href="#生成gif图像" class="headerlink" title="生成gif图像"></a>生成gif图像</h4><ul>
+<li><code>init()</code> 函数用于绘制初始坐标点</li>
+<li><code>animate()</code> 函数用于更新图像</li>
+</ul>
+<p>直线方程表示为: $w \cdot (x, y)^T + b = 0$, 即 $w_0 x + w_1 y +b =0$.</p>
+<p>所以,</p>
+<p>$$y = \frac{-(w_0x+b)}{w_1}$$</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">%matplotlib inline</div><div class="line"><span class="keyword">from</span> matplotlib <span class="keyword">import</span> pyplot <span class="keyword">as</span> plt</div><div class="line"><span class="keyword">from</span> matplotlib <span class="keyword">import</span> animation</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line"></div><div class="line">    fig = plt.figure()</div><div class="line">    ax = plt.axes(xlim=(<span class="number">-6</span>,<span class="number">6</span>), ylim=(<span class="number">-6</span>,<span class="number">6</span>))</div><div class="line">    line, = ax.plot([], [], <span class="string">'g'</span>, lw=<span class="number">2</span>)</div><div class="line">    label = ax.text(<span class="number">0</span>, <span class="number">0</span>, <span class="string">''</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">init</span><span class="params">()</span>:</span></div><div class="line">        line.set_data([],[])</div><div class="line">        x, y, x_, y_ = [], [], [], []</div><div class="line">        <span class="keyword">for</span> p <span class="keyword">in</span> training_data:</div><div class="line">            <span class="keyword">if</span> p[<span class="number">1</span>] &gt; <span class="number">0</span>:</div><div class="line">                x.append(p[<span class="number">0</span>][<span class="number">0</span>])</div><div class="line">                y.append(p[<span class="number">0</span>][<span class="number">1</span>])</div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                x_.append(p[<span class="number">0</span>][<span class="number">0</span>])</div><div class="line">                y_.append(p[<span class="number">0</span>][<span class="number">1</span>])</div><div class="line">        plt.plot(x,y, <span class="string">'bo'</span>, x_, y_, <span class="string">'rx'</span>)</div><div class="line">        plt.axis([<span class="number">-6</span>, <span class="number">6</span>, <span class="number">-6</span>, <span class="number">6</span>])</div><div class="line">        plt.grid(<span class="keyword">True</span>)</div><div class="line">        plt.xlabel(<span class="string">'x'</span>)</div><div class="line">        plt.ylabel(<span class="string">'y'</span>)</div><div class="line">        plt.title(<span class="string">'Perceptron Learing Algoritm (Orginal Format)'</span>)</div><div class="line">        <span class="keyword">return</span> line, label</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">animate</span><span class="params">(i)</span>:</span></div><div class="line">        <span class="keyword">global</span> history, ax, line, label</div><div class="line">        w = history[i][<span class="number">0</span>]</div><div class="line">        b = history[i][<span class="number">1</span>]</div><div class="line">        <span class="keyword">if</span> w[<span class="number">1</span>] == <span class="number">0</span>:</div><div class="line">            <span class="keyword">return</span> line, label</div><div class="line">        x1 = <span class="number">-7</span></div><div class="line">        y1 = -(w[<span class="number">0</span>]*x1 + b)/w[<span class="number">1</span>]</div><div class="line">        x2 = <span class="number">7</span></div><div class="line">        y2 = -(w[<span class="number">0</span>]*x2 + b)/w[<span class="number">1</span>]</div><div class="line">        line.set_data([x1,x2],[y1,y2])</div><div class="line">        x3 = <span class="number">0</span></div><div class="line">        y3 = -(w[<span class="number">0</span>]*x3 + b)/w[<span class="number">1</span>]</div><div class="line">        label.set_text(history[i])</div><div class="line">        label.set_position([x3,y3])</div><div class="line">        <span class="keyword">return</span> line, label</div><div class="line"></div><div class="line">    print(history)</div><div class="line">    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=len(history), interval = <span class="number">1000</span>, repeat=<span class="keyword">True</span>, blit=<span class="keyword">True</span>)</div><div class="line">    anim.save(<span class="string">'perceptron_lihang_original.gif'</span>, fps=<span class="number">1</span>, writer=<span class="string">'imagemagick'</span>)</div></pre></td></tr></table></figure>
+<pre><code>[[array([3, 3]), 1], [array([2, 2]), 0], [array([1, 1]), -1], [array([0, 0]), -2], [array([3, 3]), -1], [array([2, 2]), -2], [array([1, 1]), -3]]
+</code></pre><p><img src="perceptron_lihang_original_17_1.png" alt="png"></p>
+<h3 id="结果显示"><a href="#结果显示" class="headerlink" title="结果显示"></a>结果显示</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> IPython.display <span class="keyword">import</span> Image</div><div class="line">Image(url=<span class="string">'perceptron_lihang_original.gif'</span>)</div></pre></td></tr></table></figure>
+<p><img src="perceptron_lihang_original.gif"></p>
 <h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p>[1] <a href="http://beader.me/2013/12/21/perceptron-learning-algorithm/" target="_blank" rel="external">http://beader.me/2013/12/21/perceptron-learning-algorithm/</a></p>
 
       
@@ -317,7 +360,7 @@
         <p><span>本文标题:</span><a href="/2016/10/25/ml-pla/">ML-Perceptron Learning Algorithm (PLA)</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">iduido</a></p>
         <p><span>发布时间:</span>2016-10-25, 22:18:36</p>
-        <p><span>最后更新:</span>2016-10-27, 14:32:04</p>
+        <p><span>最后更新:</span>2016-11-03, 15:30:58</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2016/10/25/ml-pla/" title="ML-Perceptron Learning Algorithm (PLA)">http://yoursite.com/2016/10/25/ml-pla/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2016/10/25/ml-pla/　　作者: iduido" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -333,7 +376,7 @@
     <nav id="article-nav">
         
             <div id="article-nav-newer" class="article-nav-title">
-                <a href="/2016/10/26/hello-world/">
+                <a href="/2016/11/03/hello-world/">
                     Hello World
                 </a>
             </div>
@@ -347,7 +390,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#一级标题"><span class="toc-number">1.</span> <span class="toc-text">一级标题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#二级标题"><span class="toc-number">1.1.</span> <span class="toc-text">二级标题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#三级标题"><span class="toc-number">1.1.1.</span> <span class="toc-text">三级标题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考文献"><span class="toc-number">2.</span> <span class="toc-text">参考文献</span></a></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#一级标题"><span class="toc-number">1.</span> <span class="toc-text">一级标题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#二级标题"><span class="toc-number">1.1.</span> <span class="toc-text">二级标题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#三级标题"><span class="toc-number">1.1.1.</span> <span class="toc-text">三级标题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#程序实例"><span class="toc-number">2.</span> <span class="toc-text">程序实例</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#感知机原始形式"><span class="toc-number">2.1.</span> <span class="toc-text">感知机原始形式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#设置数据集"><span class="toc-number">2.1.1.</span> <span class="toc-text">设置数据集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置初始运行参数"><span class="toc-number">2.1.2.</span> <span class="toc-text">设置初始运行参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#判断表达式"><span class="toc-number">2.1.3.</span> <span class="toc-text">判断表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#w-和-b-的更新"><span class="toc-number">2.1.4.</span> <span class="toc-text">$w$和$b$的更新</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#感知机原始形式计算"><span class="toc-number">2.1.5.</span> <span class="toc-text">感知机原始形式计算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#计算过程图形绘制"><span class="toc-number">2.1.6.</span> <span class="toc-text">计算过程图形绘制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#生成gif图像"><span class="toc-number">2.1.6.1.</span> <span class="toc-text">生成gif图像</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#结果显示"><span class="toc-number">2.1.7.</span> <span class="toc-text">结果显示</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考文献"><span class="toc-number">3.</span> <span class="toc-text">参考文献</span></a></li></ol>
         
     </div>
     <style>
@@ -403,7 +446,7 @@
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/2016/10/26/hello-world/" title="上一篇: Hello World">
+            <a href="/2016/11/03/hello-world/" title="上一篇: Hello World">
                 <i class="fa fa-angle-left"></i>
             </a>
         
@@ -415,7 +458,7 @@
         
     </div>
 
-    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/10/26/hello-world/">Hello World</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/25/ml-pla/">ML-Perceptron Learning Algorithm (PLA)</a></li></ul>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/11/03/hello-world/">Hello World</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/25/ml-pla/">ML-Perceptron Learning Algorithm (PLA)</a></li></ul>
 
 
 
