@@ -29,9 +29,9 @@
 <meta property="og:image" content="http://lyvchao.github.io/img/perceptron_lihang_original.gif">
 <meta property="og:image" content="http://lyvchao.github.io/img/perceptron_lihang_pairing_25_1.png">
 <meta property="og:image" content="http://lyvchao.github.io/img/perceptron_lihang_pairing.gif">
-<meta property="og:image" content="http://lyvchao.github.io/scikit_learn_perceptron_files/scikit_learn_perceptron_6_1.png">
+<meta property="og:image" content="http://lyvchao.github.io/img/scikit_learn_perceptron_6_1.png">
 <meta property="og:image" content="http://lyvchao.github.io/img/scikit_learn_perceptron_12_1.png">
-<meta property="og:updated_time" content="2016-11-03T12:30:30.000Z">
+<meta property="og:updated_time" content="2016-11-03T12:31:12.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ML-Perceptron Learning Algorithm (PLA)">
 <meta name="twitter:description" content="一级标题二级标题三级标题$T(n) = \Theta(n)$
@@ -421,7 +421,7 @@ RESULT： alpha =  [2, 0, 5]   b =  -3
 <h3 id="载入数据"><a href="#载入数据" class="headerlink" title="载入数据"></a>载入数据</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">inputs = DataFrame(&#123;</div><div class="line"><span class="string">'A'</span> : [<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">5</span>],</div><div class="line"><span class="string">'B'</span> : [<span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">7</span>],</div><div class="line"><span class="string">'Targets'</span> : [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
 <h3 id="观察数据"><a href="#观察数据" class="headerlink" title="观察数据"></a>观察数据</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义配色</span></div><div class="line">colormap = np.array([<span class="string">'r'</span>,<span class="string">'k'</span>])</div><div class="line"></div><div class="line">plt.scatter(inputs.A, inputs.B, c=colormap[inputs.Targets], s=<span class="number">40</span>)</div></pre></td></tr></table></figure>
 <pre><code>&lt;matplotlib.collections.PathCollection at 0x7fc04a699cc0&gt;
-</code></pre><p><img src="scikit_learn_perceptron_files/scikit_learn_perceptron_6_1.png" alt="png"></p>
+</code></pre><p><img src="/img/scikit_learn_perceptron_6_1.png" alt="png"></p>
 <h3 id="创建感知机模型并训练"><a href="#创建感知机模型并训练" class="headerlink" title="创建感知机模型并训练"></a>创建感知机模型并训练</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 创建感知机对象</span></div><div class="line">net = perceptron.Perceptron(n_iter=<span class="number">100</span>, verbose=<span class="number">0</span>, random_state=<span class="keyword">None</span>, fit_intercept=<span class="keyword">True</span>, eta0=<span class="number">0.002</span>)</div><div class="line"></div><div class="line"><span class="comment"># 训练感知机对象</span></div><div class="line">net.fit(inputs[[<span class="string">'A'</span>,<span class="string">'B'</span>]],inputs[<span class="string">'Targets'</span>])</div></pre></td></tr></table></figure>
 <pre><code>Perceptron(alpha=0.0001, class_weight=None, eta0=0.002, fit_intercept=True,
       n_iter=100, n_jobs=1, penalty=None, random_state=None, shuffle=True,
@@ -450,7 +450,7 @@ Bias [-0.03]
         <p><span>本文标题:</span><a href="/2016/10/25/ml-pla/">ML-Perceptron Learning Algorithm (PLA)</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">lyvchao</a></p>
         <p><span>发布时间:</span>2016-10-25, 22:18:36</p>
-        <p><span>最后更新:</span>2016-11-03, 20:30:30</p>
+        <p><span>最后更新:</span>2016-11-03, 20:31:12</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2016/10/25/ml-pla/" title="ML-Perceptron Learning Algorithm (PLA)">http://lyvchao.github.io/2016/10/25/ml-pla/</a>
             <span class="copy-path" data-clipboard-text="原文: http://lyvchao.github.io/2016/10/25/ml-pla/　　作者: lyvchao" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
