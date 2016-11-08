@@ -278,7 +278,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/10/25/ml-pla/">ML-Perceptron Learning Algorithm (PLA)</a>
+      <a class="article-title" href="/2016/10/25/ml-pla/">机器学习-感知机 (ML-Perceptron Learning Algorithm (PLA))</a>
     </h1>
   
 
@@ -288,7 +288,239 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <h1 id="正在编辑整理中-…"><a href="#正在编辑整理中-…" class="headerlink" title="正在编辑整理中, …"></a>正在编辑整理中, …</h1><h1 id="程序实例"><a href="#程序实例" class="headerlink" title="程序实例"></a>程序实例</h1><h2 id="感知机原始形式"><a href="#感知机原始形式" class="headerlink" title="感知机原始形式"></a>感知机原始形式</h2><p>这个文件是《统计学习方法》(李航)一书中对应的例子.</p>
+        <blockquote>
+<p>【说明】: 本文的内容由笔者从多个文献资料编纂而成, 文末附有主要参考文献, 并对原始参考资料的作者表示敬意!<br>(1) 主要算法实现参考了<code>http://www.hankcs.com/ml/the-perceptron.html</code>, 对作者表示诚挚的感谢!<br>(2) 基于scikit-learn的代码来自<code>http://stamfordresearch.com/python-perceptron-re-visited/</code><br>(3) 文字描述来自《统计学习方法》(李航)<br>(4) 画图的程序代码来自<code>http://www.hankcs.com/ml/the-perceptron.html</code></p>
+</blockquote>
+<h1 id="感知机模型"><a href="#感知机模型" class="headerlink" title="感知机模型"></a>感知机模型</h1><ul>
+<li>感知机模型为 <strong>线性分类模型</strong>, 输入为实例特征向量, 输出为实例类别, 取 <code>+1</code> 和 <code>-1</code> 二值.</li>
+<li>感知机对应于输入空间（特征空间）中将实例划分为正负两类的分离超平面, 属于 <strong>判别模型</strong>.</li>
+<li>感知机学习旨在求出将训练数据进行线性划分的分离超平面, 为此, 导入基于误分类的损失函数, 利用梯度下降法对损失函数进行极小化, 求得感知机模型.</li>
+<li>感知机模型分为原始形式和对偶形式.</li>
+<li>感知机预测是利用学习得到的感知机模型对新输入实例进行分类.</li>
+<li>1957年由Rosenblatt提出, 是神经网络与支持向量机的基础.</li>
+</ul>
+<p><strong>定义(感知机)</strong>:</p>
+<ul>
+<li>假设输入空间 $\mathcal{X} \subseteq R^n$, 输出空间 $\mathcal{Y} = {+1, -1}$.</li>
+<li>输入$x \in \mathcal{X}$ 表示实例的特征向量, 对应于输入空间（特征空间）的点.</li>
+<li>输出$y \in \mathcal{Y}$ 表示实例的类别.</li>
+<li>由输入空间到输出空间的如下函数,</li>
+</ul>
+<p>$$f(x) = \mbox{sign}(w \cdot x + b)$$</p>
+<p>称为感知机. 其中, $w$ 和 $b$ 为感知机模型参数, $w \in R^n$ 叫做权值 (weight) 或权值向量, $b \in R$ 叫做偏置 (bias),<br>$w \cdot x$ 表示 $w$ 和 $x$ 的内积. $\mbox{sign}(\cdot)$ 是符号函数, 即</p>
+<p>$$<br>\mbox{sign}(x) = \left\{<br>   +1 , x \geq 0 \atop<br>   -1 , x \leq 0 \right.<br>$$</p>
+<ul>
+<li>线性分类器<br>$$ \{ f | f(x) = w \cdot x + b \} $$</li>
+<li>几何解释<br>线性方程,<br>$$ w \cdot x + b = 0 $$<br>对应特征空间 $R^n$ 的一个超平面$S$, 其中$w$是超平面的法向量, $b$ 是超平面的截距.</li>
+</ul>
+<p><img src="/img/perceptron_super_plain.png" alt="感知机超平面"></p>
+<h1 id="感知机学习"><a href="#感知机学习" class="headerlink" title="感知机学习"></a>感知机学习</h1><p>由训练数据集<br>$$T = \{ (x_1,y_1), (x_2,y_2), \cdots, (x_N, y_N) \}$$,<br>其中, $x_i \in \mathcal{X} = R^n$, $y_i \in \mathcal{Y} = \{+1, -1 \}, i=1, 2, \cdots, N$.<br>求得感知机模型 $f(x) = \mbox{sign}(w \cdot x + b)$, 即求得模型参数 $w$ 和 $b$.</p>
+<ul>
+<li>感知机预测, 通过学习得到的感知机模型, 对于新的输入实例, 给出其对应的输出类别.</li>
+</ul>
+<h1 id="感知机学习策略"><a href="#感知机学习策略" class="headerlink" title="感知机学习策略"></a>感知机学习策略</h1><ul>
+<li>数据集线性可分</li>
+</ul>
+<p>给定数据集 $ T = \{ (x_1,y_1), (x_2,y_2), \cdots, (x_N, y_N) \}$, $x_i \in \mathcal{X} = R^n$, $y_i \in \mathcal{Y} = \{ +1, -1 \}$, $i =1, 2, \cdots, N$, 如果存在某个超平面$S$,</p>
+<p>$$ w \cdot x + b = 0$$</p>
+<p>能够将数据集的正实例点和负实例点完全正确划分到$S$的两侧, 即对所有的$y_i = +1$ 的实例 $i$, 有$w \cdot x_i + b &gt; 0$, 对所有 $y_i = -1$的实例 $i$, 有 $w \cdot x_i + b &lt; 0$, 则称 $T$ 为线性可分数据集, 否则称数据集$T$线性不可分.</p>
+<ul>
+<li>输入空间$R^n$中任意一点$x_i$到超平面的距离,</li>
+</ul>
+<p>$$ \frac{1}{\Vert w \Vert} | w \cdot x_i + b |$$</p>
+<p>对于误分类数据$(x_i, y_i)$,<br>$$-y_i (w \cdot x_i + b) &gt; 0$$<br>成立. 因为当$w \cdot x_i +b &gt; 0$时, $y_i = -1$, 而当$w \cdot x_i + b &lt; 0$时, $y_i = +1$. 因此, 误分类点$x_i$到超平面$S$的距离为</p>
+<p>$$\frac{1}{\Vert w \Vert} y_i (w \cdot x_i + b)$$</p>
+<p>假设误分类集合为$M$, 所有误分类点到$S$的总距离为</p>
+<p>$$-\frac{1}{\Vert w \Vert} \sum_{x_i \in M} y_i (w \cdot x_i + b)$$</p>
+<p>不考虑分母, 得到感知机的损失函数为</p>
+<p>$$L(w, b) = - \sum_{x_i \in M} y_i (w \cdot x_i + b)$$</p>
+<h1 id="感知机学习算法"><a href="#感知机学习算法" class="headerlink" title="感知机学习算法"></a>感知机学习算法</h1><h2 id="原始形式"><a href="#原始形式" class="headerlink" title="原始形式"></a>原始形式</h2><h3 id="算法描述"><a href="#算法描述" class="headerlink" title="算法描述"></a>算法描述</h3><ul>
+<li>感知机学习算法是对以下最优化问题的算法</li>
+</ul>
+<p>$$ \mbox{min}_{w,b} L(w, b) = -\sum_{x_i \in M} y_i (w \cdot x_i +b)$$</p>
+<p>感知机学习算法是误分类驱动的, 先随机选取一个超平面, 然后用梯度下降法不断极小化上述损失函数, 损失函数梯度如下计算:</p>
+<p>$$ \nabla_w L(w,b) = - \sum_{x_i \in M} y_i x_i$$</p>
+<p>$$ \nabla_b L(w,b) = - \sum_{x_i \in M} y_i$$</p>
+<p>所谓梯度, 是一个向量, 指向是标量场增长最快的方向, 长度是最大变化率. 所谓标量场, 指的是空间中任意一个点的属性都可以用一个标量表示的场.</p>
+<p>随机选一个误分类点$(x_i, y_i)$, 对$w, b$进行更新:</p>
+<p>$$w \leftarrow w + \eta y_i x_i$$</p>
+<p>$$ b \leftarrow b + \eta y_i$$</p>
+<p>其中, $\eta ( 0 \leq \eta \leq 1)$ 是步长, 也称学习率. 损失函数的参数加上梯度上升的反方向, 于是梯度下降了. 所以上述迭代可以使损失函数不断减小, 直到0为止.</p>
+<p><strong>【算法】</strong> (感知机学习算法的原始形式)</p>
+<blockquote>
+<p>【输入】训练数据集, $T = (x_1, y_1), (x_2, y_2), \cdots, (x_n, y_n)$, 其中$x_i \in R^n$, $y_i \in y = \{-1, +1\}, i = 1, 2, \cdots, N$, 学习效率$\eta ( 0 \leq \eta \leq 1)$.<br>【输出】$w, b$; 感知机模型 $f(x) = \mbox{sign}(w \cdot x + b)$<br>(1) 选取初始 $w_0$, $b_0$.<br>(2) 在训练集中选取数据$(x_i, y_i)$<br>(3) 如果 $y_i (w \cdot x_i + b) \leq 0$, 则更新$w, b$<br>$$w \leftarrow w + \eta y_i x_i$$</p>
+<p>$$ b \leftarrow b + \eta y_i$$<br>(4) 转至(2), 直到训练集中没有误分类点.</p>
+</blockquote>
+<p>直观解释如下: 当一个实例点被误分类, 即位于分离超平面的错误一侧时, 则调整$w, b$的值, 使分离超平面向该误分类点的一侧移动, 以减少该误分类点与超平面间的距离, 直至超平面越过该误分类点使其被正确分类.</p>
+<h3 id="计算实例"><a href="#计算实例" class="headerlink" title="计算实例"></a>计算实例</h3><p>例: 如下图uoshi的训练数据集, 其正实例点为$x_1 = (3, 3)^T$, $x_2 = (4, 3)^T$, 负实例点为$x_3 = (1, 1)^T$, 试用感知机算法的原始形式求感知机模型$f(x) = \mbox{sign}(w \cdot x + b)$, 这里$w = (w^{(1)}, w^{(2)})^T$, $x = (x^{(1)}, x^{(2)})^T$.</p>
+<p><img src="/img/perceptron_example.png" alt="感知机算法举例"></p>
+<blockquote>
+<p>解: 构建最优化问题<br>$$ \mbox{min}_{w,b} L(w, b) = -\sum_{x_i \in M} y_i (w \cdot x_i +b)$$<br>按照感知机算法的原始形式求解$w, b$, 设$\eta = 1$.<br>(1) 取初值 $w_0 = 0, b_0 = 0$.<br>(2) 对于$x_1 = (3, 3)^T$, $y_1(w_0 \cdot x_1 + b_0) = 1 \times (0 \cdot x_1 + 0) = 0$, 未能正确分类, 更新 $w, b$<br>$$w_1 = w_0 + \eta y_1 x_1 = 0 + 1 \cdot 1 \cdot (3, 3)^T = (3, 3)^T$$<br>$$b_1 = b_0 + y_1 = 0 + 1 = 1$$<br>得到线性模型,<br>$$w_1 \cdot x_1 + b_1 = 3x_1^{(1)} + 3x_2^{(2)} + 1$$<br><strong>第二轮</strong>,<br>$x_1 = (3,3)^T$, $y_1 \times (w_1 \cdot x_1 + b_1) = 1 \times ((3,3)^T \cdot (3,3)^T + 1) = 19 &gt; 0$, 分类正确.<br>$x_2 = (4,3)^T$, $y_2 \times (w_1 \cdot x_2 + b_1) = 1 \times ((3,3)^T \cdot (4,3)^T + 1) = 22 &gt; 0$, 分类正确.<br>$x_3 = (1,1)^T$, $y_3 \times (w_1 \cdot x_3 + b_1) = -1 \times ((3,3)^T \cdot (1,1)^T + 1) = -10 &lt; 0$, 分类错误, 更新$w,b$ (因为取$x_3$时, 产生误分类, 所以使用 $(x_3, y_3)$ 对 $w,b$进行更新)<br>$$w_2 = w_1 + \eta y_3 x_3 = (3,3)^T + (-1)\cdot(1,1)^T = (2,2)^T$$<br>$$b_2 = b_1 + \eta y_3 = 1 + (-1) = 0$$<br>得到线性模型,<br>$$w_2 \cdot x_3 + b_2 = 2x^{(1)} + 2x^{(2)}$$<br><strong>第三轮</strong>,<br>$x_1 = (3,3)^T$, $y_1 \times (w_2 \cdot x_1 + b_2) = 1 \times ((2,2)^T \cdot (3,3)^T + 0) = 12 &gt; 0$, 分类正确.<br>$x_2 = (4,3)^T$, $y_2 \times (w_2 \cdot x_2 + b_2) = 1 \times ((2,2)^T \cdot (4,3)^T + 0) = 14 &gt; 0$, 分类正确.<br>$x_3 = (1,1)^T$, $y_3 \times (w_2 \cdot x_3 + b_2) = -1 \times ((2,2)^T \cdot (1,1)^T + 0) = -4 &lt; 0$, 分类错误, 更新$w,b$ (因为取$x_3$时, 产生误分类, 所以使用 $(x_3, y_3)$ 对 $w,b$进行更新)<br>$$w_3 = w_2 + \eta y_3 x_3 = (2,2)^T + (-1)\cdot(1,1)^T = (1,1)^T$$<br>$$b_3 = b_2 + \eta y_3 = 0 + (-1) = -1$$<br>得到线性模型,<br>$$w_3 \cdot x_3 + b_3 = x^{(1)} + x^{(2)} -1$$<br><strong>依次计算</strong><br>$$w_7 = w_6 + \eta y_3 x_3 = (2,2)^T + (-1)\cdot(1,1)^T = (1,1)^T$$<br>$$b_7 = b_6 + \eta y_3 = -2 + (-1) = -3$$<br>得到线性模型,<br>$$w_7 \cdot x_3 + b_7 = x^{(1)} + x^{(2)} -3$$<br>$x_1 = (3,3)^T$, $y_1 \times (w_7 \cdot x_1 + b_7) = 1 \times ((1,1)^T \cdot (3,3)^T -3) = 3 &gt; 0$, 分类正确.<br>$x_2 = (4,3)^T$, $y_2 \times (w_7 \cdot x_2 + b_7) = 1 \times ((1,1)^T \cdot (4,3)^T -3) = 4 &gt; 0$, 分类正确.<br>$x_3 = (1,1)^T$, $y_3 \times (w_7 \cdot x_3 + b_7) = -1 \times ((1,1)^T \cdot (1,1)^T -3) = 1 &gt; 0$, 分类正确.<br>停止更新, $w_7 = (1,1)^T, b_7 = -3$ 即为所求.<br><strong>分离超平面为</strong><br>$$x^{(1)} + x^{(2)} -3 = 0$$<br><strong>感知机模型为</strong><br>$$f(x) = \mbox{sign}(x^{(1)} + x^{(2)} -3)$$</p>
+</blockquote>
+<p>迭代计算的中间结果如下表.</p>
+<table>
+<thead>
+<tr>
+<th>迭代次数</th>
+<th>误分类点</th>
+<th>$w$</th>
+<th>$b$</th>
+<th>$w \cdot x +b$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>$x_1$</td>
+<td>$(3,3)^T$</td>
+<td>1</td>
+<td>$3x^{(1)} + 3x^{(2)} + 1$</td>
+</tr>
+<tr>
+<td>2</td>
+<td>$x_3$</td>
+<td>$(2,2)^T$</td>
+<td>0</td>
+<td>$2x^{(1)} + 2x^{(2)}$</td>
+</tr>
+<tr>
+<td>3</td>
+<td>$x_3$</td>
+<td>$(1,1)^T$</td>
+<td>-1</td>
+<td>$x^{(1)} + x^{(2)} - 1$</td>
+</tr>
+<tr>
+<td>4</td>
+<td>$x_3$</td>
+<td>$(0,0)^T$</td>
+<td>-2</td>
+<td>$-2$</td>
+</tr>
+<tr>
+<td>5</td>
+<td>$x_1$</td>
+<td>$(3,3)^T$</td>
+<td>-1</td>
+<td>$3x^{(1)} + 3x^{(2)} - 1$</td>
+</tr>
+<tr>
+<td>6</td>
+<td>$x_3$</td>
+<td>$(2,2)^T$</td>
+<td>-2</td>
+<td>$2x^{(1)} + 2x^{(2)} - 2$</td>
+</tr>
+<tr>
+<td>7</td>
+<td>$x_3$</td>
+<td>$(1,1)^T$</td>
+<td>-3</td>
+<td>$x^{(1)} + x^{(2)} - 3$</td>
+</tr>
+<tr>
+<td>8</td>
+<td>0</td>
+<td>$(1,1)^T$</td>
+<td>-3</td>
+<td>$x^{(1)} + x^{(2)} - 3$</td>
+</tr>
+</tbody>
+</table>
+<h2 id="算法的收敛性"><a href="#算法的收敛性" class="headerlink" title="算法的收敛性"></a>算法的收敛性</h2><p><strong>定理(Novikoff)</strong> 设训练集 $ T = \{ (x_1,y_1), (x_2,y_2), \cdots, (x_N, y_N) \}$ 是线性可分的, 其中 $x_i \in \mathcal{X} = R^n$, $y_i \in \mathcal{Y} = \{ +1, -1 \}$, $i =1, 2, \cdots, N$, 则</p>
+<p>(1) 存在满足条件 $\Vert \hat{w}_{opt} \Vert = 1$ 的超平面$\hat{w}_{opt} \cdot \hat{x} = w_{opt} \cdot x + b_{opt} = 0$ 将训练数据集完全分开, 且存在 $\gamma &gt; 0$, 对所有 $1, 2, \cdots, N$,<br>$$y_i(\hat{w}_{opt} \cdot \hat{x}_i) = y_i(w_{opt} \cdot x_i + b_{opt}) \geq \gamma$$<br>(2) 令 $R=max_{1 \leq i \leq N} \Vert \hat{x}_i \Vert$, 则感知机算法在训练数据集上的误分类次数$k$满足不等式<br>$$k \leq (\frac{R}{\gamma})^2$$</p>
+<h2 id="对偶形式"><a href="#对偶形式" class="headerlink" title="对偶形式"></a>对偶形式</h2><h3 id="算法描述-1"><a href="#算法描述-1" class="headerlink" title="算法描述"></a>算法描述</h3><p>对偶形式的基本想是将$w$和$b$表示为实例 $x_i$ 和标记 $y_i$ 的线性组合形式, 通过求解其系数而求得 $w,b$, 对于误分类点<br>$(x_i, y_i)$, 通过<br>$$ w \leftarrow w + \eta y_i x_i $$<br>$$ b \leftarrow b + \eta y_i $$<br>逐步修改$w,b$, 设修改过$N$次, 则 $w,b$ 关于 $(x_i, y_i)$ 的增量分别是 $\alpha_i y_i x_i$ 和 $\alpha_i y_i$, 这里 $\alpha_i = n_i y_i$, 最终$w, b$可以分别表示为<br>$$w = \sum_{i=1}^{N} \alpha_i y_i x_i$$<br>$$b = \sum_{i=1}^{N} \alpha_i y_i$$<br>这里, $\alpha_i \geq 0$, $i = 1, 2, \cdots, N$. 当 $y=1$ 时, 表示第 $i$ 个实例点由于误分而进行更新的次数, 实例点更新次数越多, 意味着它距离分离超平面越近, 也就是越难正确分类.</p>
+<p><strong>【算法】</strong>(感知机学习算法的对偶形式)</p>
+<blockquote>
+<p>【输入】训练数据集, $T = (x_1, y_1), (x_2, y_2), \cdots, (x_n, y_n)$, 其中 $x_i \in R^n$, $y_i \in y = \{-1, +1\}, i = 1, 2, \cdots, N$, 学习效率 $\eta ( 0 \leq \eta \leq 1)$.</p>
+<p>【输出】$\alpha, b$; 感知机模型 $f(x) = \mbox{sign}(\sum_{j=1}^{N} \alpha_i y_i x_i \cdot x+ b)$<br>其中, $\alpha = (\alpha_1, \alpha_2, \cdots, \alpha_N)^T$</p>
+<p>(1) $\alpha \leftarrow 0$, $b \leftarrow 0$.<br>(2) 在训练集中选取数据$(x_i, y_i)$<br>(3) 如果 $y_i (\sum_{j=1}^{N} \alpha_i y_i x_i \cdot x_i + b) \leq 0$, 则更新$\alpha, b$<br>$$ \alpha_i \leftarrow \alpha_i + \eta $$<br>$$ b \leftarrow b + \eta y_i$$<br>(4) 转至(2), 直到训练集中没有误分类点.</p>
+</blockquote>
+<h3 id="计算实例-1"><a href="#计算实例-1" class="headerlink" title="计算实例"></a>计算实例</h3><p>例: 正样本点$x_1=(3,3)^T$, $x_2=(4,3)^T$, 负样本点$x_3=(1,1)^T$</p>
+<blockquote>
+<p>解:<br>初始, $\alpha_1 = 0, \alpha_2 = 0, \alpha_3 = 0, b = 0, \eta = 1$<br><strong>第一轮</strong>,<br>计算, $\sum_{j=1}^{N} \alpha_j y_j x_j = \alpha_1 y_1 x_1 + \alpha_2 y_2 x_2 + \alpha_3 y_3 x_3 = 0$<br>当$x_1 = (3,3)^T, y_1 = 1$时,<br>$$y_1 (\sum_{j=1}^{N} \alpha_j y_j x_j \cdot x_1 +b) = 0 \leq 0$$<br>即取$x_1$时, 产生误分类, 更新<br>$$\alpha_1 = \alpha_1 + 1 = 1$$<br>$$b = 0 + y_1 = 0 + 1 = 1$$<br>$\therefore \alpha_1 = 1, \alpha_2 = 0, \alpha_3 = 0, b = 1 $<br><strong>第二轮</strong>,<br>计算, $\sum_{j=1}^{N} \alpha_j y_j x_j = \alpha_1 y_1 x_1 + \alpha_2 y_2 x_2 + \alpha_3 y_3 x_3 = (3,3)^T$<br>当$x_1 = (3,3)^T$, $y_1 (\sum_{j=1}^{N} \alpha_j y_j x_j \cdot x_1 +b) = 19 \geq 0$<br>当$x_2 = (4,3)^T$, $y_2 (\sum_{j=1}^{N} \alpha_j y_j x_j \cdot x_2 +b) = 22 \geq 0$<br>当$x_3 = (1,1)^T$, $y_3 (\sum_{j=1}^{N} \alpha_j y_j x_j \cdot x_3 +b) = -7 \leq 0$<br>$x_3$为误分类点, 更新,<br>$$\alpha_3 = \alpha_3 + 1 = 1$$<br>$$b = b + y_3 = 1 + (-1) = 0$$<br>$\therefore \alpha_1 = 1, \alpha_2 = 0, \alpha_3 = 1, b =0 $<br><strong>$\cdots \cdots$</strong><br><strong>第七轮</strong>,<br>计算, $\sum_{j=1}^{N} \alpha_j y_j x_j = \alpha_1 y_1 x_1 + \alpha_2 y_2 x_2 + \alpha_3 y_3 x_3 = (2,2)^T$<br>当$x_1 = (3,3)^T$, $y_1 (\sum_{j=1}^{N} \alpha_j y_j x_j \cdot x_1 +b) = 10 \geq 0$<br>当$x_2 = (4,3)^T$, $y_2 (\sum_{j=1}^{N} \alpha_j y_j x_j \cdot x_2 +b) = 12 \geq 0$<br>当$x_3 = (1,1)^T$, $y_3 (\sum_{j=1}^{N} \alpha_j y_j x_j \cdot x_3 +b) = -2 \leq 0$<br>$x_3$为误分类点, 更新,<br>$$\alpha_3 = \alpha_3 + 1 = 4 + 1 = 5$$<br>$$b = b + y_3 = -2 + (-1) = -3$$<br>$\therefore \alpha_1 = 2, \alpha_2 = 0, \alpha_3 = 5, b = -3 $<br><strong>第八轮</strong>,<br>计算, $\sum_{j=1}^{N} \alpha_j y_j x_j = \alpha_1 y_1 x_1 + \alpha_2 y_2 x_2 + \alpha_3 y_3 x_3 = (1,1)^T$<br>当$x_1 = (3,3)^T$, $y_1 (\sum_{j=1}^{N} \alpha_j y_j x_j \cdot x_1 +b) = 3 \geq 0$<br>当$x_2 = (4,3)^T$, $y_2 (\sum_{j=1}^{N} \alpha_j y_j x_j \cdot x_2 +b) = 4 \geq 0$<br>当$x_3 = (1,1)^T$, $y_3 (\sum_{j=1}^{N} \alpha_j y_j x_j \cdot x_3 +b) = 1 \geq 0$<br>$\therefore \alpha_1 = 2, \alpha_2 = 0, \alpha_3 = 5, b = -3 $ 即为所求.<br><strong>分离超平面为</strong><br>$$x^{(1)} + x^{(2)} - 3 = 0$$<br><strong>感知机模型为</strong><br>$$f(x) = \mbox{sign}(x^{(1)} + x^{(2)} - 3)$$</p>
+</blockquote>
+<p>迭代过程如下,</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">k</th>
+<th style="text-align:left">0</th>
+<th style="text-align:left">1</th>
+<th style="text-align:left">2</th>
+<th style="text-align:left">3</th>
+<th style="text-align:left">4</th>
+<th style="text-align:left">5</th>
+<th style="text-align:left">6</th>
+<th style="text-align:left">7</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">–</td>
+<td style="text-align:left">–</td>
+<td style="text-align:left">$x_1$</td>
+<td style="text-align:left">$x_2$</td>
+<td style="text-align:left">$x_3$</td>
+<td style="text-align:left">$x_4$</td>
+<td style="text-align:left">$x_5$</td>
+<td style="text-align:left">$x_6$</td>
+<td style="text-align:left">$x_7$</td>
+</tr>
+<tr>
+<td style="text-align:left">$\alpha_1$</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">2</td>
+</tr>
+<tr>
+<td style="text-align:left">$\alpha_2$</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left">$\alpha_3$</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">3</td>
+<td style="text-align:left">3</td>
+<td style="text-align:left">4</td>
+<td style="text-align:left">5</td>
+</tr>
+<tr>
+<td style="text-align:left">b</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">-1</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">-1</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">-3</td>
+</tr>
+</tbody>
+</table>
+<h1 id="程序实例"><a href="#程序实例" class="headerlink" title="程序实例"></a>程序实例</h1><h2 id="感知机原始形式"><a href="#感知机原始形式" class="headerlink" title="感知机原始形式"></a>感知机原始形式</h2><p>这个文件是《统计学习方法》(李航)一书中对应的例子.</p>
 <p>这里用到<code>numpy</code>, 以支持向量运算.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div></pre></td></tr></table></figure>
 <h3 id="设置数据集"><a href="#设置数据集" class="headerlink" title="设置数据集"></a>设置数据集</h3><p>训练数据集, $x_1=(3,3)^T$, $x_2=(4,3)^T$为正例, $x_3=(1,1)^T$为负例.</p>
@@ -411,9 +643,11 @@ Bias [-0.03]
 </code></pre><p><img src="/img/scikit_learn_perceptron_12_1.png" alt="png"></p>
 <h3 id="使用训练好的感知机进行预测"><a href="#使用训练好的感知机进行预测" class="headerlink" title="使用训练好的感知机进行预测"></a>使用训练好的感知机进行预测</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">pred = net.predict(inputs[[<span class="string">'A'</span>,<span class="string">'B'</span>]])</div><div class="line">print(pred)</div></pre></td></tr></table></figure>
 <pre><code>[0 0 0 1 1 0 0 1 0 0 1 1 1 1]
-</code></pre><h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ol>
+</code></pre><h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p>1.《统计学习方法》, 李航</p>
+<ol>
 <li><a href="http://www.hankcs.com/ml/the-perceptron.html" target="_blank" rel="external">http://www.hankcs.com/ml/the-perceptron.html</a></li>
 <li><a href="http://beader.me/2013/12/21/perceptron-learning-algorithm/" target="_blank" rel="external">http://beader.me/2013/12/21/perceptron-learning-algorithm/</a></li>
+<li><a href="http://stamfordresearch.com/python-perceptron-re-visited/" target="_blank" rel="external">http://stamfordresearch.com/python-perceptron-re-visited/</a></li>
 </ol>
 
       
